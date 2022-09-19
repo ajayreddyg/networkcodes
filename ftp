@@ -1,0 +1,82 @@
+Algorithm
+1. Create a file which has to be read by the server. Open a notepad, write the file contents
+and save it in the program folder sample.txt.
+2. Import the required io and net packages.
+3. Initialized the socket class for communicate with the server with port number 4000.
+4. Client specifies the file name to the server (eg. Sample.txt)
+5. Initialize the BufferReader class to read the filename from the terminal.
+6. Initialize the PrintWriter class to write and send the file name to the server through the
+socket.
+7. Initialize BufferReader class to read the file contents from the server.
+8. Repeatedly read the data till end of file equals to empty.
+9. Close the socket stream, filestream and BufferReader classes
+10. End of the program.
+Algorithm – Server
+1. Import the required io and net packages.
+2. Initialized the SeverSocket class and accept the client connection.
+3. Initialize the BufferReader class for reading the client request (ie file name)
+4. Initialize the FileReader class for reading the file.
+5. Initialize Buffer Reader class for reading the file contents line by line.
+6. Repeatedly read the file content line by line and send to the client through the socket S.
+7. Close the socket stream, BufferedReader.
+Program – Client
+import java.net.*;
+import java.io.*;
+public class FTPClient
+{
+ public static void main( String args[ ] ) throws Exception
+ {
+ Socket s = new Socket(InetAddress.getLocalHost(), 4000);
+ // reading the file name from keyboard. Uses input stream
+ System.out.println("Enter the file name");
+ BufferedReader keyRead = new BufferedReader(new InputStreamReader(System.in));
+ String fname = keyRead.readLine();
+
+ // sending the file name to server. Uses PrintWriter
+ OutputStream ostream = s.getOutputStream( );
+ PrintWriter pwrite = new PrintWriter(ostream, true);
+ pwrite.println(fname);
+ // receiving the contents from server. Uses input stream
+ InputStream istream = s.getInputStream();
+ BufferedReader socketRead = new BufferedReader(new InputStreamReader(istream));
+ String str;
+ while((str = socketRead.readLine()) != null) // reading line-by-line
+ {
+ System.out.println(str);
+ }
+ pwrite.close(); socketRead.close(); keyRead.close();
+ }
+}
+Program – Server
+import java.io.*;
+import java.net.*;
+public class FTPServer
+{
+ public static void main(String args[]) throws Exception
+ { // establishing the connection with the server
+ ServerSocket ss = new ServerSocket(4000);
+ System.out.println("Server ready for connection");
+ Socket s = ss.accept(); // binding with port: 4000
+ System.out.println("Connection is successful and wating for chatting");
+
+ // reading the file name from client
+ InputStream istream = s.getInputStream( );
+ BufferedReader fileRead=new BufferedReader(new InputStreamReader(istream));
+ String fname = fileRead.readLine( );
+ // reading file contents
+ BufferedReader contentRead = new BufferedReader(new FileReader(fname) );
+
+ // keeping output stream ready to send the contents
+ OutputStream ostream = s.getOutputStream( );
+ PrintWriter pwrite = new PrintWriter(ostream, true);
+
+ String str;
+ while((str = contentRead.readLine()) != null) // reading line-by-line from file
+ {
+pwrite.println(str); // sending each line to client
+ }
+ s.close(); ss.close(); // closing network sockets
+ pwrite.close(); fileRead.close(); contentRead.close();
+ }
+}
+Output
